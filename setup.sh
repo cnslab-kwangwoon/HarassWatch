@@ -1,3 +1,5 @@
+#!/bin/bash
+
 git clone https://github.com/PKU-YuanGroup/Video-LLaVA
 cd Video-LLaVA
 conda create -n videollava python=3.10 -y
