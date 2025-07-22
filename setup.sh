@@ -1,5 +1,5 @@
 #!/bin/bash
-pip install -U transformers av
+pip install -U transformers av kaggle
 
 
 
