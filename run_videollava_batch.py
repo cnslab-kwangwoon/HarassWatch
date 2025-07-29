@@ -9,7 +9,7 @@ from transformers import VideoLlavaProcessor, VideoLlavaForConditionalGeneration
 # 설정
 CSV_PATH = "social_vr_eval_list.csv"
 OUTPUT_PATH = "social_vr_eval_results_wo_background.csv"
-REASON_PATH = "social_vr_eval_reasons_wo_background.csv"
+# REASON_PATH = "social_vr_eval_reasons_wo_background.csv"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MODEL_ID = "LanguageBind/Video-LLaVA-7B-hf"
 with open("PROMPT_v2.txt", "r", encoding="utf-8") as f:
@@ -79,10 +79,8 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
             pred = "Aggressive"
         elif "personal space violation" in lower:
             pred = "Personal"
-        elif "benign" in lower:
-            pred = "Benign"
         else:
-            pred = "Unknown"
+            pred = "Benign"
 
         # 이유 분리
         first_period = answer.find(".")
@@ -90,6 +88,11 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
 
         print(f"📌 Predicted: {pred}")
         print(f"🧠 Reason: {reasoning}")
+
+        # ✅ 중간 저장
+        if (idx + 1) % 10 == 0:
+            pd.DataFrame(results).to_csv(OUTPUT_PATH, index=False)
+            print(f"💾 [{idx + 1}] Interim results saved to CSV.")
 
     except Exception as e:
         answer = f"[ERROR] {e}"
@@ -100,16 +103,18 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
     results.append({
         "video_path": video_path,
         "true_label": true_label,
-        "predicted_label": pred
-        # "response_text": answer.strip()
+        "predicted_label": pred,
+        "response_text": answer.strip()
     })
 
-    reasons.append({
-        "video_path": video_path,
-        "reason": reasoning.strip()
-    })
+    # reasons.append({
+    #     "video_path": video_path,
+    #     "reason": reasoning.strip()
+    # })
 
 # 결과 저장
 pd.DataFrame(results).to_csv(OUTPUT_PATH, index=False)
-pd.DataFrame(reasons).to_csv(REASON_PATH, index=False)
-print(f"\n✅ 저장 완료: {OUTPUT_PATH}, {REASON_PATH}")
+print(f"\n✅ 저장 완료: {OUTPUT_PATH}")
+
+# pd.DataFrame(reasons).to_csv(REASON_PATH, index=False)
+# print(f"\n✅ 저장 완료: {OUTPUT_PATH}, {REASON_PATH}")
