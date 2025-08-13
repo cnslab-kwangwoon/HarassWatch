@@ -1,32 +1,32 @@
 import os
 import subprocess
+import sys
 
-# 설정
-INPUT_ROOT = "Social_VR"
-OUTPUT_ROOT = "Social_VR_Segmented"
-SEGMENT_LENGTH = 5  # 초 단위로 자를 길이
+# 사용법: python split_recursive.py <INPUT_ROOT> <OUTPUT_ROOT> <SEGMENT_LENGTH_SEC>
+INPUT_ROOT = sys.argv[1]
+OUTPUT_ROOT = sys.argv[2]
+SEGMENT_LENGTH = int(sys.argv[3])  # 초 단위
 
-# 클래스 디렉토리 순회
-for class_name in os.listdir(INPUT_ROOT):
-    class_dir = os.path.join(INPUT_ROOT, class_name)
-    if not os.path.isdir(class_dir):
-        continue
+VIDEO_EXTS = (".mp4",)  # 필요하면 (".mp4", ".mov", ".mkv", ".avi") 로 확장
 
-    output_class_dir = os.path.join(OUTPUT_ROOT, class_name)
-    os.makedirs(output_class_dir, exist_ok=True)
+for root, dirs, files in os.walk(INPUT_ROOT):
+    # INPUT_ROOT 기준 상대 경로 계산 → OUTPUT_ROOT에 동일 구조로 생성
+    rel = os.path.relpath(root, INPUT_ROOT)
+    out_dir = os.path.join(OUTPUT_ROOT, rel) if rel != "." else OUTPUT_ROOT
+    os.makedirs(out_dir, exist_ok=True)
 
-    for filename in os.listdir(class_dir):
-        if not filename.endswith(".mp4"):
+    for filename in files:
+        if not filename.lower().endswith(VIDEO_EXTS):
             continue
 
-        input_path = os.path.join(class_dir, filename)
-        base_name = os.path.splitext(filename)[0]
-        output_pattern = os.path.join(output_class_dir, f"{base_name}_clip_%03d.mp4")
+        input_path = os.path.join(root, filename)
+        base_name, _ = os.path.splitext(filename)
+        output_pattern = os.path.join(out_dir, f"{base_name}_clip_%03d.mp4")
 
         cmd = [
             "ffmpeg", "-loglevel", "error",
             "-i", input_path,
-            "-c", "copy",
+            "-c", "copy",              # GOP 경계에서만 자름(빠름). 정확한 컷이 필요하면 "-c:v", "libx264", "-c:a", "aac" 사용
             "-map", "0",
             "-segment_time", str(SEGMENT_LENGTH),
             "-f", "segment",
@@ -34,6 +34,5 @@ for class_name in os.listdir(INPUT_ROOT):
             output_pattern
         ]
 
-        print(f"[PROCESSING] {filename} in {class_name}...")
-        subprocess.run(cmd)
-
+        print(f"[PROCESSING] {input_path} → {output_pattern}")
+        subprocess.run(cmd, check=False)
