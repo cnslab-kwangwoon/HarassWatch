@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "TinyLLaVA-Video"))
 
+from tqdm import tqdm
 import argparse
 import re
 import requests
@@ -258,7 +259,7 @@ if __name__ == "__main__":
     DATASET_PATH = "../dataset/0813Data_20"
 
     # PROMPT_v*.txt 읽기
-    with open("prompts/PROMPT_v2.txt", "r", encoding="utf-8") as f:
+    with open("prompts/PROMPT_v3.txt", "r", encoding="utf-8") as f:
         QUERY_TEXT = f.read().strip()
 
     # Args 공통값
@@ -273,9 +274,9 @@ if __name__ == "__main__":
         temperature    = 0.5
         top_p          = 0.95
         num_beams      = 1
-        num_frame      = 8
+        num_frame      = 16
         max_frame      = 16
-        max_new_tokens = 128
+        max_new_tokens = 256
 
     disable_torch_init()
 
@@ -290,7 +291,8 @@ if __name__ == "__main__":
     SAVE_EVERY = 20  # 20개마다 저장
     partial_output_path = OUTPUT_PATH.replace(".csv", "_partial.csv")
 
-    for idx, row in df.iterrows():
+    #for idx, row in df.iterrows():
+    for idx, row in tqdm(df.iterrows(), total=len(df), desc="🔍 Evaluating"):
         args = Args()
         args.video_file = DATASET_PATH + "/" + row["video_path"]
 
