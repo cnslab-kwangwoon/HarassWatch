@@ -4,7 +4,7 @@ from pathlib import Path
 
 # 루트 디렉토리 설정
 ROOT_DIR = Path(sys.argv[1])  # 필요시 절대경로로 바꿔도 됨
-CSV_OUTPUT = ROOT_DIR + "groundtruth.csv"
+CSV_OUTPUT = sys.argv[1] + "/ground_truth.csv"
 
 rows = []
 
@@ -26,7 +26,7 @@ for behavior_class_dir in sorted(ROOT_DIR.iterdir()):
         # .mp4 파일 순회
         for video_file in sorted(sub_behavior_dir.glob("*.mp4")):
             rows.append({
-                "video": str(video_file),       # 상대경로 또는 절대경로 가능
+                "video_path": str(video_file),       # 상대경로 또는 절대경로 가능
                 "label": main_label,
                 "sub_label": sub_label
             })
