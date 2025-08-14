@@ -7,12 +7,13 @@ from tqdm import tqdm
 from transformers import VideoLlavaProcessor, VideoLlavaForConditionalGeneration
 
 # 설정
-CSV_PATH = "social_vr_eval_list.csv"
+DATASET_ROOT = "../dataset/0813Data_20/"
+CSV_PATH = DATASET_ROOT + "ground_truth.csv"
 OUTPUT_PATH = "social_vr_eval_results_wo_background.csv"
 # REASON_PATH = "social_vr_eval_reasons_wo_background.csv"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MODEL_ID = "LanguageBind/Video-LLaVA-7B-hf"
-with open("PROMPT_v2.txt", "r", encoding="utf-8") as f:
+with open("prompts/PROMPT_v3.txt", "r", encoding="utf-8") as f:
     PROMPT_TEMPLATE = f.read().strip()
 
 # 모델 로드
@@ -47,7 +48,7 @@ results = []
 reasons = []
 
 for idx, row in tqdm(df.iterrows(), total=len(df)):
-    video_path = row["video_path"]
+    video_path = DATASET_ROOT + row["video_path"]
     true_label = row["label"]
     full_path = os.path.join(".", video_path)
 
@@ -73,22 +74,6 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
         else:
             answer = answer_raw.strip()
 
-        # 분류 판단
-        lower = answer.lower()
-        if "aggressive behavior" in lower:
-            pred = "Aggressive"
-        elif "personal space violation" in lower:
-            pred = "Personal"
-        else:
-            pred = "Benign"
-
-        # 이유 분리
-        first_period = answer.find(".")
-        reasoning = answer[first_period+1:].strip() if first_period != -1 else ""
-
-        print(f"📌 Predicted: {pred}")
-        print(f"🧠 Reason: {reasoning}")
-
         # ✅ 중간 저장
         if (idx + 1) % 10 == 0:
             pd.DataFrame(results).to_csv(OUTPUT_PATH, index=False)
@@ -103,7 +88,6 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
     results.append({
         "video_path": video_path,
         "true_label": true_label,
-        "predicted_label": pred,
         "response_text": answer.strip()
     })
 

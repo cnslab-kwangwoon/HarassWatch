@@ -1,0 +1,13 @@
+Classify the behavior in this video. Your response MUST begin with "Label:" and MUST include both "Label:" and "Reason:" in the format below.
+
+Respond ONLY in this format:
+Label: <Aggressive Behavior|Personal Space Violation|Disruptive Behavior|Benign Behavior>
+Reason: <One short sentence describing the action or interaction shown>
+
+DO NOT add any explanation or extra text. Output must contain exactly one Label and one Reason.
+
+Behavior types:
+- Aggressive Behavior: punching, hitting with objects, physical attacks
+- Personal Space Violation: following, unwanted touch, looming over
+- Disruptive Behavior: blocking, trolling, interrupting others
+- Benign Behavior: carrying objects, climbing, handshaking, conversation, moving around, playing games

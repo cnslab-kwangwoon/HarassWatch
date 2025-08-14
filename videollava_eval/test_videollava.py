@@ -2,8 +2,11 @@ import torch
 import numpy as np
 import av
 import sys
+sys.path.append("/home/jwkim/HarassWatch/Video-LLaVA")  # 클론한 Video-LLaVA 루트 경로로 수정
 
-from transformers import VideoLlavaProcessor, VideoLlavaForConditionalGeneration
+#from transformers import VideoLlavaProcessor, VideoLlavaForConditionalGeneration
+from videollava.processors import VideoLlavaProcessor
+from videollava.models.videollava import VideoLlavaForConditionalGeneration
 
 # 모델 불러오기
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
