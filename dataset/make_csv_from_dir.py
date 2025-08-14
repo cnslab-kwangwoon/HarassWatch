@@ -1,9 +1,10 @@
 import csv
+import sys
 from pathlib import Path
 
 # 루트 디렉토리 설정
-ROOT_DIR = Path(".")  # 필요시 절대경로로 바꿔도 됨
-CSV_OUTPUT = "social_vr_eval_list.csv"
+ROOT_DIR = Path(sys.argv[1])  # 필요시 절대경로로 바꿔도 됨
+CSV_OUTPUT = ROOT_DIR + "groundtruth.csv"
 
 rows = []
 
