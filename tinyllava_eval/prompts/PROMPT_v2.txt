@@ -1,5 +1,5 @@
 Classify the behavior in this video. Output MUST begin with the exact word: Label:
 
 Respond ONLY in the following format:
-Label: <Aggressive|Benign|Personal>
+Label: <Aggressive Behavior|Personal Space Violation|Disruptive Behavior|Benign Behavior>
 Reason: <one short sentence about the action>

@@ -8,6 +8,8 @@ import requests
 import time
 import gc
 import traceback, sys
+import pandas as pd
+import io
 from PIL import Image
 from io import BytesIO
 
@@ -20,8 +22,6 @@ from torchvision.io import read_video
 from tinyllava.utils import *
 from tinyllava.data import *
 from tinyllava.model import *
-
-
 
 def image_parser(args):
     out = args.image_file.split(args.sep)
@@ -250,17 +250,15 @@ def eval_model(args, model=None, tokenizer=None, image_processor=None):
     return outputs
 
 if __name__ == "__main__":
-    import pandas as pd
-    import os, io, sys
 
     MODEL_PATH   = "Zhang199/TinyLLaVA-Video-Qwen2.5-3B-Group-16-512"
     CONV_MODE    = "qwen2_base"
-    CSV_PATH     = "0813_20_ground_truth.csv"
+    CSV_PATH     = "ground_truth.csv"
     OUTPUT_PATH  = "tinyllava_batch_results.csv"
-    DATASET_PATH = "/home/cnslab/HarassWatch/0813Data_20"
+    DATASET_PATH = "../dataset/0813Data_20"
 
     # PROMPT_v*.txt 읽기
-    with open("PROMPT_v4.txt", "r", encoding="utf-8") as f:
+    with open("prompts/PROMPT_v2.txt", "r", encoding="utf-8") as f:
         QUERY_TEXT = f.read().strip()
 
     # Args 공통값
@@ -289,7 +287,10 @@ if __name__ == "__main__":
 
     df = pd.read_csv(DATASET_PATH + "/" + CSV_PATH)
     results = []
-    for _, row in df.iterrows():
+    SAVE_EVERY = 20  # 20개마다 저장
+    partial_output_path = OUTPUT_PATH.replace(".csv", "_partial.csv")
+
+    for idx, row in df.iterrows():
         args = Args()
         args.video_file = DATASET_PATH + "/" + row["video_path"]
 
@@ -308,6 +309,11 @@ if __name__ == "__main__":
             "true_label": row.get("true_label", row.get("label", "")),
             "response_text": output_text
         })
+
+        # 🔁 일정 간격마다 중간 저장
+        if (idx + 1) % SAVE_EVERY == 0:
+            pd.DataFrame(results).to_csv(partial_output_path, index=False)
+            print(f"📝 Partial save at {idx + 1}: {partial_output_path} ({time.strftime('%X')})", flush=True)
 
     pd.DataFrame(results).to_csv(OUTPUT_PATH, index=False)
     print(f"✅ Saved: {OUTPUT_PATH}")
