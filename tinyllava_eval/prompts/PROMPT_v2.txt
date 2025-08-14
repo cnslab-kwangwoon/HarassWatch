@@ -1,0 +1,5 @@
+Classify the behavior in this video. Output MUST begin with the exact word: Label:
+
+Respond ONLY in the following format:
+Label: <Aggressive|Benign|Personal>
+Reason: <one short sentence about the action>
