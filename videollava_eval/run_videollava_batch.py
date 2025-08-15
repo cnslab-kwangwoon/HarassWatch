@@ -1,4 +1,5 @@
 import os
+import sys
 import torch
 import numpy as np
 import av
@@ -9,20 +10,28 @@ from transformers import VideoLlavaProcessor, VideoLlavaForConditionalGeneration
 # 설정
 DATASET_ROOT = "../dataset/0813Data_20/"
 CSV_PATH = DATASET_ROOT + "ground_truth.csv"
-OUTPUT_PATH = "social_vr_eval_results_wo_background.csv"
+OUTPUT_PATH = "videollava_results"
 # REASON_PATH = "social_vr_eval_reasons_wo_background.csv"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MODEL_ID = "LanguageBind/Video-LLaVA-7B-hf"
-with open("prompts/PROMPT_v3.txt", "r", encoding="utf-8") as f:
+with open("prompts/PROMPT_v4.txt", "r", encoding="utf-8") as f:
     PROMPT_TEMPLATE = f.read().strip()
 
 # 모델 로드
 print("🔧 Loading Video-LLaVA...")
 processor = VideoLlavaProcessor.from_pretrained(MODEL_ID)
+#model = VideoLlavaForConditionalGeneration.from_pretrained(
+#    MODEL_ID,
+#    torch_dtype=torch.float16 if DEVICE.type == "cuda" else torch.float32
+#).to(DEVICE)
+
 model = VideoLlavaForConditionalGeneration.from_pretrained(
     MODEL_ID,
-    torch_dtype=torch.float16 if DEVICE.type == "cuda" else torch.float32
-).to(DEVICE)
+    torch_dtype=torch.float16,
+    device_map="auto",
+    trust_remote_code=True
+)
+
 print("✅ Model loaded.")
 
 # 프레임 추출 함수
@@ -60,19 +69,20 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
 
         prompt = f"USER: <video> {PROMPT_TEMPLATE} ASSISTANT:"
         inputs = processor(text=prompt, videos=frames, return_tensors="pt")
-        inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
+        inputs = {k: v.to(model.device) for k, v in inputs.items()}
 
         with torch.no_grad():
             output_ids = model.generate(**inputs, max_new_tokens=512)
 
         answer_raw = processor.batch_decode(output_ids, skip_special_tokens=True)[0]
-        print(f"🗨️ Raw response: {answer_raw}")
 
         # ASSISTANT: 태그 이후만 사용
         if "ASSISTANT:" in answer_raw:
             answer = answer_raw.split("ASSISTANT:")[-1].strip()
         else:
             answer = answer_raw.strip()
+
+        print(f"🗨️ Response: {answer}")
 
         # ✅ 중간 저장
         if (idx + 1) % 10 == 0:

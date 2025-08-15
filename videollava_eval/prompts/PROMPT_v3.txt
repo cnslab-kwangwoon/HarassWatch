@@ -1,4 +1,5 @@
 Classify the behavior in this video. Your response MUST begin with "Label:" and MUST include both "Label:" and "Reason:" in the format below.
+Note that the robots are VR users who play the social VR platform.
 
 Respond ONLY in this format:
 Label: <Aggressive Behavior|Personal Space Violation|Disruptive Behavior|Benign Behavior>

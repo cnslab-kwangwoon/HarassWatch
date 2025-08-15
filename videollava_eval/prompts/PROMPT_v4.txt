@@ -1,0 +1,21 @@
+Classify the behavior shown in this video.
+
+Your response MUST:
+- Begin with "Label:"
+- Contain both "Label:" and "Reason:" fields
+- Follow the exact format below
+
+Context:
+The video shows avatars (virtual characters) controlled by users in a social VR environment. You may consider the background, interaction context, or proximity between avatars to determine intent.
+
+Respond ONLY in this format:
+Label: <Aggressive Behavior|Personal Space Violation|Disruptive Behavior|Benign Behavior>
+Reason: <One short sentence describing the action or interaction shown>
+
+DO NOT add any explanation, commentary, or extra text. Output must contain **exactly one** Label and one Reason.
+
+Behavior definitions:
+- Aggressive Behavior: punching, hitting with objects, physical attacks
+- Personal Space Violation: following, unwanted touch, looming over someone
+- Disruptive Behavior: blocking, trolling, interrupting others
+- Benign Behavior: carrying objects, climbing, handshaking, casual conversation, walking, or playing games
