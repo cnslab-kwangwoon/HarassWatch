@@ -33,7 +33,7 @@ for behavior_class_dir in sorted(ROOT_DIR.iterdir()):
 
 # CSV 저장
 with open(CSV_OUTPUT, "w", newline='', encoding="utf-8") as f:
-    writer = csv.DictWriter(f, fieldnames=["video", "label", "sub_label"])
+    writer = csv.DictWriter(f, fieldnames=["video_path", "label", "sub_label"])
     writer.writeheader()
     writer.writerows(rows)
 
